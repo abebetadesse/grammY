@@ -40,9 +40,7 @@ type FilteredEvent<E extends UpdateEvent, U extends Update> =
     & FilteredEventCore<U>;
 
 // generate a structure with all aliases for a narrowed update
-type FilteredEventCore<U extends Update> =
-    & Record<"update", U>
-    & AliasProps<Omit<U, "update_id">>;
+type FilteredEventCore<U extends Update> = AliasProps<Omit<U, "update_id">>;
 
 type Middleware<C extends UpdateEvent> = (ctx: C) => unknown | Promise<unknown>;
 class EventHub<C extends UpdateEvent> {
@@ -77,10 +75,6 @@ hub.on(filter, async (event) => {});
 hub.on("message", async (event) => {});
 
 hub.on("chat_join_request", (event) => event.chatJoinRequest.chat_join_request);
-hub.on(
-    "chat_join_request",
-    (event) => event.update.chat_join_request.chat_join_request,
-);
 
 hub.on<"message" | "channel_post">("message", async (event) => {
     await 0;

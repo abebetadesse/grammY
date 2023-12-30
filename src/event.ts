@@ -29,79 +29,30 @@ export type AliasProps<U> = {
 };
 type RenamedUpdate = AliasProps<Omit<Update, "update_id">>;
 
-export class UpdateEvent implements RenamedUpdate {
-    constructor(public readonly update: Update) {}
+declare const up: Update;
 
-    /** Alias for `event.update.message` */
-    get message() {
-        return this.update.message;
-    }
-    /** Alias for `event.update.edited_message` */
-    get editedMessage() {
-        return this.update.edited_message;
-    }
-    /** Alias for `event.update.channel_post` */
-    get channelPost() {
-        return this.update.channel_post;
-    }
-    /** Alias for `event.update.edited_channel_post` */
-    get editedChannelPost() {
-        return this.update.edited_channel_post;
-    }
-    /** Alias for `event.update.message_reaction` */
-    get messageReaction() {
-        return this.update.message_reaction;
-    }
-    /** Alias for `event.update.message_reaction_count` */
-    get messageReactionCount() {
-        return this.update.message_reaction_count;
-    }
-    /** Alias for `event.update.inline_query` */
-    get inlineQuery() {
-        return this.update.inline_query;
-    }
-    /** Alias for `event.update.chosen_inline_result` */
-    get chosenInlineResult() {
-        return this.update.chosen_inline_result;
-    }
-    /** Alias for `event.update.callback_query` */
-    get callbackQuery() {
-        return this.update.callback_query;
-    }
-    /** Alias for `event.update.shipping_query` */
-    get shippingQuery() {
-        return this.update.shipping_query;
-    }
-    /** Alias for `event.update.pre_checkout_query` */
-    get preCheckoutQuery() {
-        return this.update.pre_checkout_query;
-    }
-    /** Alias for `event.update.poll` */
-    get poll() {
-        return this.update.poll;
-    }
-    /** Alias for `event.update.poll_answer` */
-    get pollAnswer() {
-        return this.update.poll_answer;
-    }
-    /** Alias for `event.update.my_chat_member` */
-    get myChatMember() {
-        return this.update.my_chat_member;
-    }
-    /** Alias for `event.update.chat_member` */
-    get chatMember() {
-        return this.update.chat_member;
-    }
-    /** Alias for `event.update.chat_join_request` */
-    get chatJoinRequest() {
-        return this.update.chat_join_request;
-    }
-    /** Alias for `event.update.chat_boost` */
-    get chatBoost() {
-        return this.update.chat_boost;
-    }
-    /** Alias for `event.update.removed_chat_boost` */
-    get removedChatBoost() {
-        return this.update.removed_chat_boost;
-    }
+export class UpdateEvent implements RenamedUpdate {
+    public message: Update["message"] = up.message;
+    public editedMessage: Update["edited_message"] = up.edited_message;
+    public channelPost: Update["channel_post"] = up.channel_post;
+    public editedChannelPost: Update["edited_channel_post"] =
+        up.edited_channel_post;
+    public messageReaction: Update["message_reaction"] = up.message_reaction;
+    public messageReactionCount: Update["message_reaction_count"] =
+        up.message_reaction_count;
+    public inlineQuery: Update["inline_query"] = up.inline_query;
+    public chosenInlineResult: Update["chosen_inline_result"] =
+        up.chosen_inline_result;
+    public callbackQuery: Update["callback_query"] = up.callback_query;
+    public shippingQuery: Update["shipping_query"] = up.shipping_query;
+    public preCheckoutQuery: Update["pre_checkout_query"] =
+        up.pre_checkout_query;
+    public poll: Update["poll"] = up.poll;
+    public pollAnswer: Update["poll_answer"] = up.poll_answer;
+    public myChatMember: Update["my_chat_member"] = up.my_chat_member;
+    public chatMember: Update["chat_member"] = up.chat_member;
+    public chatJoinRequest: Update["chat_join_request"] = up.chat_join_request;
+    public chatBoost: Update["chat_boost"] = up.chat_boost;
+    public removedChatBoost: Update["removed_chat_boost"] =
+        up.removed_chat_boost;
 }
