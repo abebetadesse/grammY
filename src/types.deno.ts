@@ -12,9 +12,6 @@ import {
     type InputSticker as InputStickerF,
     type Opts as OptsF,
 } from "https://deno.land/x/grammy_types@v3.4.4/mod.ts";
-import { debug as d, isDeno } from "./platform.deno.ts";
-
-const debug = d("grammy:warn");
 
 // === Export all API types
 export * from "https://deno.land/x/grammy_types@v3.4.4/mod.ts";
@@ -73,14 +70,6 @@ export class InputFile {
         this.fileData = file;
         filename ??= this.guessFilename(file);
         this.filename = filename;
-        if (
-            typeof file === "string" &&
-            (file.startsWith("http:") || file.startsWith("https:"))
-        ) {
-            debug(
-                `InputFile received the local file path '${file}' that looks like a URL. Is this a mistake?`,
-            );
-        }
     }
     private guessFilename(
         file: ConstructorParameters<typeof InputFile>[0],
@@ -109,11 +98,6 @@ export class InputFile {
         const data = this.fileData;
         // Handle local files
         if (typeof data === "string") {
-            if (!isDeno) {
-                throw new Error(
-                    "Reading files by path requires a Deno environment",
-                );
-            }
             const file = await Deno.open(data);
             return iterateReader(file);
         }
@@ -147,7 +131,7 @@ async function* fetchFile(url: string | URL): AsyncIterable<Uint8Array> {
     yield* body;
 }
 function isDenoFile(data: unknown): data is Deno.FsFile {
-    return isDeno && data instanceof Deno.FsFile;
+    return true;
 }
 
 // === Export InputFile types
