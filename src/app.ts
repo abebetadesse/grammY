@@ -78,42 +78,12 @@ class EventHub<U extends Update> {
 
 const hub = new EventHub();
 
-const c = hub.on(["message", "channel_post"]).on("message");
-c.use(() => {});
+// all these work:
+hub.on("message");
+hub.on("message", (up) => {});
+const sub = hub.on(["message", "channel_post"]);
+sub.use((up) => {});
+hub.on(["message", "channel_post"], () => {});
 
-hub.on(["message", "channel_post"], (event) => {});
-const filter: FilterQuery[] = [
-    "message",
-    "callback_query",
-    "edited_message",
-];
-hub.on(filter);
-hub.on(filter, (event) => {});
-hub.on(filter, async (event) => {});
-
-hub.on("message", async (event) => {});
-
-hub.on(
-    "chat_join_request",
-    (event) => event.chat_join_request.chat_join_request,
-);
-
-hub.on(["message", "channel_post"], async (event) => {
-    // const x: undefined = event.callback_query;
-    // const y: object = event.message ?? event.channel_post;
-    await 0;
-});
-
-hub.on<"message" | "channel_post">("message", async (event) => {
-    // const x: undefined = event.callback_query;
-    // const y: object = event.message ?? event.channel_post;
-    await 0;
-});
-
-const x = hub.on(["message", "channel_post"], () => {});
-x.use(() => {});
-
-hub.on("message", (event) => Promise.resolve());
-hub.on("message_reaction", (event) => Promise.resolve());
-
-hub.on("removed_chat_boost", (event) => {});
+// this one does not:
+hub.on(["message", "channel_post"], (up) => {});
