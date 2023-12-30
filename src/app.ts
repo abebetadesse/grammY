@@ -1,4 +1,4 @@
-import { Context, Filter, FilterQuery } from "./src/mod.ts";
+import type { Event, Filter, FilterQuery } from "./event.ts";
 
 const filter: FilterQuery[] = [
     "message",
@@ -6,8 +6,8 @@ const filter: FilterQuery[] = [
     "edited_message",
 ];
 
-type Middleware<C extends Context> = (ctx: C) => unknown | Promise<unknown>;
-class Composer<C extends Context> {
+type Middleware<C extends Event> = (ctx: C) => unknown | Promise<unknown>;
+class Composer<C extends Event> {
     use(...middleware: Array<Middleware<C>>): Composer<C> {
         console.log("Adding", middleware.length, "generic handlers");
         return this;
@@ -33,7 +33,7 @@ bot.on(filter, async (ctx) => {});
 
 bot.on("message", async (ctx) => {});
 
-bot.on("chat_join_request", (ctx) => ctx.chatJoinRequest.chat);
+bot.on("chat_join_request", (ctx) => ctx.chatJoinRequest);
 
 bot.on<"message" | "channel_post">("message", async (ctx) => {
     await 0;
