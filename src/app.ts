@@ -1,24 +1,45 @@
-import type { Update, UpdateEvent } from "./event.ts";
+export interface Update {
+    update_id: number;
 
-type FilterFunction<C extends UpdateEvent, D extends C> = (ctx: C) => ctx is D;
-
-export function matchFilter<E extends UpdateEvent, Q extends FilterQuery>(
-    filter: Q | Q[],
-): FilterFunction<E, Filter<E, Q>> {
-    console.log("Matching", filter);
-    return (event: E): event is Filter<E, Q> => !!event;
+    message?: { message: string };
+    edited_message?: { edited_message: string };
+    channel_post?: { channel_post: string };
+    edited_channel_post?: { edited_channel_post: string };
+    message_reaction?: { message_reaction: string };
+    message_reaction_count?: { message_reaction_count: string };
+    inline_query?: { inline_query: string };
+    chosen_inline_result?: { chosen_inline_result: string };
+    callback_query?: { callback_query: string };
+    shipping_query?: { shipping_query: string };
+    pre_checkout_query?: { pre_checkout_query: string };
+    poll?: { poll: string };
+    poll_answer?: { poll_answer: string };
+    my_chat_member?: { my_chat_member: string };
+    chat_member?: { chat_member: string };
+    chat_join_request?: { chat_join_request: string };
+    chat_boost?: { chat_boost: string };
+    removed_chat_boost?: { removed_chat_boost: string };
 }
 
-/** All valid filter queries (every event type except update_id) */
+type FilterFunction<U extends Update, V extends U> = (up: U) => up is V;
+
+export function matchFilter<U extends Update, Q extends FilterQuery>(
+    filter: Q | Q[],
+): FilterFunction<U, Filter<U, Q>> {
+    console.log("Matching", filter);
+    return (up: U): up is Filter<U, Q> => !!up;
+}
+
+/** All valid filter queries (every update key except update_id) */
 export type FilterQuery = keyof Omit<Update, "update_id">;
 
-/** Narrow down an event object based on a filter query */
-export type Filter<E extends UpdateEvent, Q extends FilterQuery> = PerformQuery<
-    E,
+/** Narrow down an update object based on a filter query */
+export type Filter<U extends Update, Q extends FilterQuery> = PerformQuery<
+    U,
     RunQuery<Q>
 >;
 
-// generate an object structure that can be intersected with events to narrow them down
+// generate an object structure that can be intersected with updates to narrow them down
 type RunQuery<Q extends string> = Combine<L1Fragment<Q>, Q>;
 
 // maps each part of the filter query to Record<"key", object>
@@ -29,31 +50,29 @@ type Combine<U, K extends string> = U extends unknown
     ? U & Partial<Record<Exclude<K, keyof U>, undefined>>
     : never;
 
-// apply a query result by intersecting it with Update, and then injecting into E
-type PerformQuery<E extends UpdateEvent, U extends object> = U extends unknown
-    ? FilteredEvent<E, Update & U>
+// apply a query result by intersecting it with update,
+// and then using these values to override the actual update
+type PerformQuery<U extends Update, R extends object> = R extends unknown
+    ? FilteredEvent<U, Update & R>
     : never;
 
-// set the given update into a given event object, and adjust the aliases
-type FilteredEvent<E extends UpdateEvent, U extends Update> =
+// narrow down an update by intersecting it with a different update
+type FilteredEvent<E extends Update, U extends Update> =
     & E
-    & FilteredEventCore<U>;
+    & Omit<U, "update_id">;
 
-// generate a structure with all aliases for a narrowed update
-type FilteredEventCore<U extends Update> = Omit<U, "update_id">;
-
-type Middleware<C extends UpdateEvent> = (ctx: C) => unknown | Promise<unknown>;
-class EventHub<C extends UpdateEvent> {
-    use(...middleware: Array<Middleware<C>>): EventHub<C> {
+type Middleware<U extends Update> = (ctx: U) => unknown | Promise<unknown>;
+class EventHub<U extends Update> {
+    use(...middleware: Array<Middleware<U>>): EventHub<U> {
         console.log("Adding", middleware.length, "generic handlers");
         return this;
     }
     on<Q extends FilterQuery>(
         filter: Q | Q[],
-        ...middleware: Array<Middleware<Filter<C, Q>>>
-    ): EventHub<Filter<C, Q>> {
+        ...middleware: Array<Middleware<Filter<U, Q>>>
+    ): EventHub<Filter<U, Q>> {
         console.log("Adding", middleware.length, "handlers for", filter);
-        return new EventHub<Filter<C, Q>>();
+        return new EventHub<Filter<U, Q>>();
     }
 }
 
@@ -80,14 +99,14 @@ hub.on(
 );
 
 hub.on(["message", "channel_post"], async (event) => {
-    const x: undefined = event.callback_query;
-    const y: object = event.message ?? event.channel_post;
+    // const x: undefined = event.callback_query;
+    // const y: object = event.message ?? event.channel_post;
     await 0;
 });
 
 hub.on<"message" | "channel_post">("message", async (event) => {
-    const x: undefined = event.callback_query;
-    const y: object = event.message ?? event.channel_post;
+    // const x: undefined = event.callback_query;
+    // const y: object = event.message ?? event.channel_post;
     await 0;
 });
 
