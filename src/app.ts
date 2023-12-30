@@ -1,4 +1,4 @@
-import type { AliasProps, Update, UpdateEvent } from "./event.ts";
+import type { Update, UpdateEvent } from "./event.ts";
 
 type FilterFunction<C extends UpdateEvent, D extends C> = (ctx: C) => ctx is D;
 
@@ -40,7 +40,7 @@ type FilteredEvent<E extends UpdateEvent, U extends Update> =
     & FilteredEventCore<U>;
 
 // generate a structure with all aliases for a narrowed update
-type FilteredEventCore<U extends Update> = AliasProps<Omit<U, "update_id">>;
+type FilteredEventCore<U extends Update> = Omit<U, "update_id">;
 
 type Middleware<C extends UpdateEvent> = (ctx: C) => unknown | Promise<unknown>;
 class EventHub<C extends UpdateEvent> {
@@ -74,9 +74,20 @@ hub.on(filter, async (event) => {});
 
 hub.on("message", async (event) => {});
 
-hub.on("chat_join_request", (event) => event.chatJoinRequest.chat_join_request);
+hub.on(
+    "chat_join_request",
+    (event) => event.chat_join_request.chat_join_request,
+);
+
+hub.on(["message", "channel_post"], async (event) => {
+    const x: undefined = event.callback_query;
+    const y: object = event.message ?? event.channel_post;
+    await 0;
+});
 
 hub.on<"message" | "channel_post">("message", async (event) => {
+    const x: undefined = event.callback_query;
+    const y: object = event.message ?? event.channel_post;
     await 0;
 });
 
