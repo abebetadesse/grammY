@@ -29,7 +29,7 @@ export type AliasProps<U> = {
 };
 type RenamedUpdate = AliasProps<Omit<Update, "update_id">>;
 
-export class Event implements RenamedUpdate {
+export class UpdateEvent implements RenamedUpdate {
     constructor(public readonly update: Update) {}
 
     /** Alias for `event.update.message` */
@@ -105,47 +105,3 @@ export class Event implements RenamedUpdate {
         return this.update.removed_chat_boost;
     }
 }
-
-type FilterFunction<C extends Event, D extends C> = (ctx: C) => ctx is D;
-
-export function matchFilter<E extends Event, Q extends FilterQuery>(
-    filter: Q | Q[],
-): FilterFunction<E, Filter<E, Q>> {
-    console.log("Matching", filter);
-    return (event: E): event is Filter<E, Q> => !!event;
-}
-
-/** All valid filter queries (every event type except update_id) */
-export type FilterQuery = keyof Omit<Update, "update_id">;
-
-/** Narrow down an event object based on a filter query */
-export type Filter<E extends Event, Q extends FilterQuery> = PerformQuery<
-    E,
-    RunQuery<Q>
->;
-
-// generate an object structure that can be intersected with events to narrow them down
-type RunQuery<Q extends string> = Combine<L1Fragment<Q>, Q>;
-
-// maps each part of the filter query to Record<"key", object>
-type L1Fragment<Q extends string> = Q extends unknown ? Record<Q, object>
-    : never;
-// define all other fields from query as keys with value `undefined`
-type Combine<U, K extends string> = U extends unknown
-    ? U & Partial<Record<Exclude<K, keyof U>, undefined>>
-    : never;
-
-// apply a query result by intersecting it with Update, and then injecting into E
-type PerformQuery<E extends Event, U extends object> = U extends unknown
-    ? FilteredEvent<E, Update & U>
-    : never;
-
-// set the given update into a given event object, and adjust the aliases
-type FilteredEvent<E extends Event, U extends Update> =
-    & E
-    & FilteredEventCore<U>;
-
-// generate a structure with all aliases for a narrowed update
-type FilteredEventCore<U extends Update> =
-    & Record<"update", U>
-    & AliasProps<Omit<U, "update_id">>;
